@@ -45,6 +45,7 @@ export function ReactionDiffusion3D() {
     choosePreset: (next: Preset) => {
       // Each pattern starts again from fresh seeds, the same as 2D
       setPreset(next);
+      setSpeed(next.speed ?? DEFAULT_SPEED);
       setParams(paramsFor(next, true));
       sceneRef.current?.load(scatterSeeds(board.size));
     },

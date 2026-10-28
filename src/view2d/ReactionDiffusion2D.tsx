@@ -49,6 +49,7 @@ export function ReactionDiffusion2D() {
       // Each pattern starts again from fresh seeds. Starting from the last pattern would make
       // what you see depend on what was chosen before
       setPreset(next);
+      setSpeed(next.speed ?? DEFAULT_SPEED);
       setParams(paramsFor(next));
       sceneRef.current?.load(scatterSeeds(board.width, board.height));
     },

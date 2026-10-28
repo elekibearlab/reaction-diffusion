@@ -1,7 +1,7 @@
 import type { Params } from '@/core/params';
 import type { Preset } from '@/data/presets';
 import { Button, ButtonGrid, ButtonRow, Section, Select, Slider, Stats } from '@/ui';
-import { t } from '@/shared/i18n';
+import { type LocalizedText, t } from '@/shared/i18n';
 import { PALETTES, type Palette } from '@/shared/palette';
 import type { BoardChoice, Display, FieldStats } from '../types';
 
@@ -27,11 +27,17 @@ type Props = {
   onDisplayChange: (display: Display) => void;
 };
 
+/** Preset buttons in two groups: the patterns first, then the terms that explain them */
+const PRESET_GROUPS = [
+  { id: 'pattern', title: { ja: '模様', en: 'Patterns' } },
+  { id: 'term', title: { ja: 'しくみ（項を 1 つずつ）', en: 'How it works (one term at a time)' } },
+] as const satisfies { id: Preset['group']; title: LocalizedText }[];
+
 /** Shows feed and kill with enough digits to tell presets apart */
 const formatRate = (value: number) => value.toFixed(4);
 
 /**
- * The control panel on the right. From the top: "Playback", "Patterns", "Numbers", "Grid", "Display".
+ * The control panel on the right. From the top: "Playback", "Patterns", "How it works", "Numbers", "Grid", "Display".
  *
  * @param props.presets         Patterns to choose from
  * @param props.presetId        Selected pattern
@@ -78,20 +84,25 @@ export function ControlPanel(props: Props) {
         <Stats {...props.stats} />
       </Section>
 
-      <Section title={t({ ja: '模様', en: 'Patterns' })}>
-        <ButtonGrid>
-          {props.presets.map((preset, i) => (
-            <Button
-              key={preset.id}
-              onClick={() => props.onPresetChange(preset.id)}
-              active={preset.id === props.presetId}
-              title={String(i + 1)}
-            >
-              {t(preset.name)}
-            </Button>
-          ))}
-        </ButtonGrid>
-      </Section>
+      {PRESET_GROUPS.map((group) => (
+        <Section key={group.id} title={t(group.title)}>
+          <ButtonGrid>
+            {props.presets.map(
+              (preset, i) =>
+                preset.group === group.id && (
+                  <Button
+                    key={preset.id}
+                    onClick={() => props.onPresetChange(preset.id)}
+                    active={preset.id === props.presetId}
+                    title={String(i + 1)}
+                  >
+                    {t(preset.name)}
+                  </Button>
+                ),
+            )}
+          </ButtonGrid>
+        </Section>
+      ))}
 
       <Section title={t({ ja: '数値', en: 'Numbers' })}>
         <Slider

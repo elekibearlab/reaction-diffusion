@@ -10,7 +10,7 @@ It will be featured on the YouTube channel "Elekibear Digital Lab".
 ## Features
 
 - **Try each term by itself** (diffusion only, reaction only, both)
-- Choose a pattern preset (dividing spots, maze, coral, holes, waves)
+- Choose a pattern preset (coral, maze, dividing spots, waves, holes)
 - Change feed F, kill k and the diffusion rates with sliders
 - In 2D, drag to add v. "Clear" empties the dish so you can draw your own seeds
 - Choose the grid size (2D: 192×108 to 512×288, 3D: 32³ to 64³)
@@ -50,7 +50,7 @@ Press "JA | EN" at the top right, or add `?lang=en` to the URL, to show English.
 |---|---|
 | Space | Play / stop |
 | → | Step one frame |
-| 1–7 | Choose a pattern |
+| 1–7 | Choose a pattern (6 and 7: diffusion only, reaction only) |
 | R | Seed again |
 | C | Clear the dish (2D) |
 | M | Switch 2D ↔ 3D |

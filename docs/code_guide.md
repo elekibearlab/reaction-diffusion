@@ -15,7 +15,7 @@ src/
     grayScott2d.ts      盤面 → 作る → 添字 → 種を置く → ラプラシアン → 1 ステップ（step）→ 速い版（stepFast）
     grayScott3d.ts      3D 版。grayScott2d.ts と同じ順・同じ中身。違うのは z があり、となりが 6 つになることだけ
   data/
-    presets.ts          模様のプリセット 7 種（拡散だけ・反応だけ → 両方で出る模様。2D と 3D で共通）
+    presets.ts          模様のプリセット 7 種（両方の項で出る模様 5 つ → 拡散だけ・反応だけ。2D と 3D で共通）
   view2d/              2D の画面（平らな皿。v の量を色にしたテクスチャ 1 枚）
     ReactionDiffusion2D.tsx  入口。UI に出す state を持ち、部品を組み立てる
     seed.ts  types.ts        最初の種のまき方と、画面の中で共有する型

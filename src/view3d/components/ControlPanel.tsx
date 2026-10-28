@@ -1,0 +1,206 @@
+import type { Params } from '@/core/params';
+import type { Preset } from '@/data/presets';
+import { Button, ButtonGrid, ButtonRow, Section, Select, Slider, Stats, Toggle } from '@/ui';
+import { t } from '@/shared/i18n';
+import { PALETTES, type Palette } from '@/shared/palette';
+import type { BoardChoice, Display, FieldStats } from '../types';
+
+type Props = {
+  presets: Preset[];
+  presetId: string;
+  running: boolean;
+  /** Steps per frame */
+  speed: number;
+  autoRotate: boolean;
+  boards: BoardChoice[];
+  boardId: string;
+  params: Params;
+  display: Display;
+  stats: FieldStats;
+  onPresetChange: (id: string) => void;
+  onToggleRunning: () => void;
+  onStep: () => void;
+  onSpeedChange: (speed: number) => void;
+  onToggleRotate: () => void;
+  onZoomIn: () => void;
+  onZoomOut: () => void;
+  onBoardChange: (id: string) => void;
+  onParamsChange: (params: Params) => void;
+  onRestart: () => void;
+  onDisplayChange: (display: Display) => void;
+};
+
+/** Shows feed and kill with enough digits to tell presets apart */
+const formatRate = (value: number) => value.toFixed(4);
+
+/**
+ * The control panel on the right. From the top: "Playback", "Camera", "Patterns", "Numbers", "Grid", "Display".
+ *
+ * @param props.presets         Patterns to choose from
+ * @param props.presetId        Selected pattern
+ * @param props.running         Whether it is playing
+ * @param props.speed           Steps per frame
+ * @param props.autoRotate      Whether the camera turns by itself
+ * @param props.boards          Grid sizes to choose from
+ * @param props.boardId         Current grid size
+ * @param props.params          Diffusion rates, feed and kill
+ * @param props.display         How the field looks
+ * @param props.stats           Step count and frame rate
+ * @param props.onPresetChange  Changes the pattern
+ * @param props.onToggleRunning Plays or stops
+ * @param props.onStep          Moves one frame
+ * @param props.onSpeedChange   Changes the steps per frame
+ * @param props.onToggleRotate  Turns auto rotation on or off
+ * @param props.onZoomIn        Moves the camera closer
+ * @param props.onZoomOut       Moves the camera away
+ * @param props.onBoardChange   Changes the grid size
+ * @param props.onParamsChange  Changes a number
+ * @param props.onRestart       Starts again with new seeds
+ * @param props.onDisplayChange Changes how the field looks
+ */
+export function ControlPanel(props: Props) {
+  const setParam = (key: keyof Params) => (value: number) =>
+    props.onParamsChange({ ...props.params, [key]: value });
+
+  return (
+    <>
+      <Section title={t({ ja: '再生', en: 'Playback' })}>
+        <ButtonRow>
+          <Button onClick={props.onToggleRunning} active={props.running} title="Space">
+            {props.running ? t({ ja: '■ 停止', en: '■ Stop' }) : t({ ja: '▶ 再生', en: '▶ Play' })}
+          </Button>
+          <Button onClick={props.onStep} title="→">
+            {t({ ja: '1コマ', en: 'Step' })}
+          </Button>
+        </ButtonRow>
+        <Slider
+          label={t({ ja: '速さ', en: 'Speed' })}
+          value={props.speed}
+          min={1}
+          max={16}
+          format={(value) => t({ ja: `${value} 回/コマ`, en: `${value}/frame` })}
+          onChange={props.onSpeedChange}
+        />
+        <Stats {...props.stats} />
+      </Section>
+
+      <Section title={t({ ja: 'カメラ', en: 'Camera' })}>
+        <ButtonRow>
+          <Button onClick={props.onToggleRotate} active={props.autoRotate} title="A">
+            {t({ ja: '自動回転', en: 'Auto rotate' })}
+          </Button>
+          <Button onClick={props.onZoomIn} title="+">
+            ＋
+          </Button>
+          <Button onClick={props.onZoomOut} title="−">
+            −
+          </Button>
+        </ButtonRow>
+      </Section>
+
+      <Section title={t({ ja: '模様', en: 'Patterns' })}>
+        <ButtonGrid>
+          {props.presets.map((preset, i) => (
+            <Button
+              key={preset.id}
+              onClick={() => props.onPresetChange(preset.id)}
+              active={preset.id === props.presetId}
+              title={String(i + 1)}
+            >
+              {t(preset.name)}
+            </Button>
+          ))}
+        </ButtonGrid>
+      </Section>
+
+      <Section title={t({ ja: '数値', en: 'Numbers' })}>
+        <Slider
+          label={t({ ja: '補充 F', en: 'Feed F' })}
+          value={props.params.feed}
+          min={0.01}
+          max={0.1}
+          step={0.0005}
+          format={formatRate}
+          onChange={setParam('feed')}
+        />
+        <Slider
+          label={t({ ja: '除去 k', en: 'Kill k' })}
+          value={props.params.kill}
+          min={0.04}
+          max={0.075}
+          step={0.0005}
+          format={formatRate}
+          onChange={setParam('kill')}
+        />
+        {/* Up to 0.16: past 1/6 the 3D step becomes unstable (see DT in core/params.ts) */}
+        <Slider
+          label={t({ ja: '拡散 u', en: 'Spread u' })}
+          value={props.params.du}
+          min={0}
+          max={0.16}
+          step={0.01}
+          format={(value) => value.toFixed(2)}
+          onChange={setParam('du')}
+        />
+        <Slider
+          label={t({ ja: '拡散 v', en: 'Spread v' })}
+          value={props.params.dv}
+          min={0}
+          max={0.16}
+          step={0.01}
+          format={(value) => value.toFixed(2)}
+          onChange={setParam('dv')}
+        />
+      </Section>
+
+      <Section title={t({ ja: '盤面', en: 'Grid' })}>
+        <Select
+          label={t({ ja: '大きさ', en: 'Size' })}
+          value={props.boardId}
+          onChange={props.onBoardChange}
+        >
+          {props.boards.map((choice) => (
+            <option key={choice.id} value={choice.id}>
+              {t(choice.name)} ({choice.size}³)
+            </option>
+          ))}
+        </Select>
+        <ButtonRow>
+          <Button onClick={props.onRestart} title="R">
+            {t({ ja: 'まき直す', en: 'Seed again' })}
+          </Button>
+        </ButtonRow>
+      </Section>
+
+      <Section title={t({ ja: '表示（模様には影響しない）', en: 'Display (visual only)' })}>
+        <Select
+          label={t({ ja: '色', en: 'Colors' })}
+          value={props.display.palette}
+          onChange={(palette) =>
+            props.onDisplayChange({ ...props.display, palette: palette as Palette })
+          }
+        >
+          {PALETTES.map((palette) => (
+            <option key={palette.id} value={palette.id}>
+              {t(palette.name)}
+            </option>
+          ))}
+        </Select>
+        <Slider
+          label={t({ ja: '見せる v', en: 'Show v ≥' })}
+          value={props.display.threshold}
+          min={0.05}
+          max={0.4}
+          step={0.01}
+          format={(value) => value.toFixed(2)}
+          onChange={(threshold) => props.onDisplayChange({ ...props.display, threshold })}
+        />
+        <Toggle
+          label={t({ ja: '半分に切って中を見る', en: 'Cut in half to see inside' })}
+          checked={props.display.cut}
+          onChange={(cut) => props.onDisplayChange({ ...props.display, cut })}
+        />
+      </Section>
+    </>
+  );
+}

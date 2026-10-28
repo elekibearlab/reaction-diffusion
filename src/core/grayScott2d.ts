@@ -71,13 +71,13 @@ export function addSeed(field: Field, cx: number, cy: number, radius: number) {
  * @param y      Row
  */
 export function laplacian(values: Float32Array, field: Field, x: number, y: number): number {
-  return (
+  // The 4 neighbors: left, right, below, above
+  const sum =
     values[index(field, x - 1, y)] +
     values[index(field, x + 1, y)] +
     values[index(field, x, y - 1)] +
-    values[index(field, x, y + 1)] -
-    4 * values[index(field, x, y)]
-  );
+    values[index(field, x, y + 1)];
+  return sum - 4 * values[index(field, x, y)];
 }
 
 /**

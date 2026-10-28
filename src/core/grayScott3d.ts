@@ -81,15 +81,15 @@ export function laplacian(
   y: number,
   z: number,
 ): number {
-  return (
+  // The 6 neighbors: left, right, below, above, behind, in front
+  const sum =
     values[index(field, x - 1, y, z)] +
     values[index(field, x + 1, y, z)] +
     values[index(field, x, y - 1, z)] +
     values[index(field, x, y + 1, z)] +
     values[index(field, x, y, z - 1)] +
-    values[index(field, x, y, z + 1)] -
-    6 * values[index(field, x, y, z)]
-  );
+    values[index(field, x, y, z + 1)];
+  return sum - 6 * values[index(field, x, y, z)];
 }
 
 /**

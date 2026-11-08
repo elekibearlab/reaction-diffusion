@@ -3,7 +3,7 @@
 # Reaction-Diffusion — 2D / 3D
 
 反応拡散のモデル「Gray-Scott モデル」を Three.js で動かしたサンプルです。\
-2 つの物質が広がって混ざるだけで、斑点・迷路・波のような模様が生まれます。\
+2 種類の物質が、まわりに広がりながら反応するだけで、斑点・迷路・波のような模様が生まれます。\
 画面上部のメニューで 2D・3D を切り替えて遊べます。
 
 - **ブラウザで触る**:
@@ -73,7 +73,7 @@ tests/       テストコード
 4. **[`src/core/params.ts`](src/core/params.ts)** — 拡散の速さ・補充・除去
 5. **[`src/data/presets.ts`](src/data/presets.ts)** — 模様のプリセット
 
-1 マスを 1 ステップ進めるのは、この部分です（u は「えさ」、v は u を食べて増える物質）。
+1 マスを 1 ステップ進めるのは、この部分です（u は U の濃さ、v は V の濃さ。U は外から足される材料で、V は U を使って増える物質）。
 
 ```ts
 if (terms.diffusion) {
@@ -81,15 +81,15 @@ if (terms.diffusion) {
   dv += params.dv * laplacian(field.v, field, x, y);
 }
 if (terms.reaction) {
-  du += reactU(u, v, params);  // 食べられる + 補充される
-  dv += reactV(u, v, params);  // 増える − 取り除かれる
+  du += reactU(u, v, params);  // 反応で使われる + 補充される
+  dv += reactV(u, v, params);  // 反応で増える − 除去される
 }
 next.u[i] = u + du * DT;
 next.v[i] = v + dv * DT;
 ```
 
 `laplacian` は「隣りのマスの合計 − 自分 × 隣りの数」で、隣りより少なければ増え、多ければ減ります。\
-v は u より広がるのが遅いので、v は固まって斑点になり、そのまわりに u が流れ込みます。
+V は U より遅く広がるので、V は固まって斑点になり、そのまわりに U が流れ込みます。
 
 ## 参考
 

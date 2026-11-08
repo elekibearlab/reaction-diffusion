@@ -3,7 +3,7 @@ English | [日本語](README.md)
 # Reaction-Diffusion — 2D / 3D
 
 A sample that runs the reaction-diffusion model called the Gray-Scott model, with Three.js.\
-Two chemicals only spread and mix, and patterns like spots, mazes and waves appear.\
+Two substances only spread around and react, and patterns like spots, mazes and waves appear.\
 The menu at the top switches between 2D and 3D.
 
 - **Try it in your browser**
@@ -73,7 +73,7 @@ The logic is in `src/core/`. It does not depend on any framework, so reading it 
 4. **[`src/core/params.ts`](src/core/params.ts)** — diffusion rates, feed and kill
 5. **[`src/data/presets.ts`](src/data/presets.ts)** — the pattern presets
 
-This part moves one cell forward one step (u is the "food", v eats u and grows).
+This part moves one cell forward one step (u is the concentration of U, v is the concentration of V. U is a material added from outside, and V is a substance that uses U to grow).
 
 ```ts
 if (terms.diffusion) {
@@ -81,15 +81,15 @@ if (terms.diffusion) {
   dv += params.dv * laplacian(field.v, field, x, y);
 }
 if (terms.reaction) {
-  du += reactU(u, v, params);  // eaten + fed
-  dv += reactV(u, v, params);  // grows − removed
+  du += reactU(u, v, params);  // used by the reaction + fed
+  dv += reactV(u, v, params);  // grown by the reaction − killed
 }
 next.u[i] = u + du * DT;
 next.v[i] = v + dv * DT;
 ```
 
 `laplacian` is "sum of the neighbors − the cell × the number of neighbors": a cell with less than its neighbors gains, a cell with more loses.\
-v spreads slower than u, so v gathers into spots and u flows in around them.
+V spreads slower than U, so V gathers into spots and U flows in around them.
 
 ## References
 
